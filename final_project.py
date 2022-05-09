@@ -3,7 +3,7 @@
 
 # Importing needed libraries
 
-from functools import cache
+# from functools import cache
 from tabnanny import verbose
 import numpy as np
 import pandas as pd
@@ -339,7 +339,7 @@ with splitting_dataset:
 
     # Drawing learning curves take a lot of time, we don't want browser to rebuild it every time, so we do caching using @cache before a function
     # Function for learning curve for LogisticRegression
-    @cache
+    # @cache
     def draw_graph1():
         train_sizes, train_scores, test_scores = learning_curve(LogisticRegression(), x_1, y_1, cv=10, scoring='accuracy', n_jobs=-1, train_sizes=np.linspace(0.01, 1, 50), verbose=1)
         train_mean = np.mean(train_scores, axis=1)
@@ -352,7 +352,7 @@ with splitting_dataset:
         return fig_curve
 
     # function for drawing confusion matrix
-    @cache
+    # @cache
     def conf_matrix():
         return confusion_matrix(Y_test, log_model.predict(X_test))
     
@@ -403,7 +403,7 @@ with random_forest:
     col1.text('R squared score:')
     col1.write(r2_score(Y_test, r_forest.predict(X_test)))
 
-    @cache
+    # @cache
     def draw_graph2():
         train_sizes, train_scores, test_scores = learning_curve(RandomForestClassifier(n_estimators=20), x_1, y_1, cv=10, scoring='accuracy', n_jobs=-1, train_sizes=np.linspace(0.01, 1, 50), verbose=1)
         train_mean = np.mean(train_scores, axis=1)
@@ -415,7 +415,7 @@ with random_forest:
 
         return fig_curve2
 
-    @cache
+    # @cache
     def conf_matrix2():
         return confusion_matrix(Y_test, r_forest.predict(X_test))
 
@@ -439,7 +439,7 @@ with k_means:
     st.image(image2, use_column_width=True)
 
     # Function for finding optimal number of clusters
-    @cache
+    # @cache
     def elbow_met(data):
         distortions = []
         K = range(1,10)
