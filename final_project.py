@@ -263,7 +263,7 @@ with removing_outliers:
     data['Arrival Delay in Minutes'].fillna((data['Arrival Delay in Minutes'].mean()), inplace=True)
     data['Age'].fillna((data['Age'].mean()), inplace=True)
 
-    st.markdown('We will find outliers using IQR technique, then change them to NaN values and after we will drop NaN values from dataset: ')
+    st.markdown('We will find outliers using IQR technique, then change them to NaN values and after we will change NaN values in dataset into mean values of every corresponding column: ')
 
     # Showing code-blocks in a web page
     code1 = '''for x in data[['Checkin service', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']]:
