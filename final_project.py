@@ -76,6 +76,12 @@ image = Image.open('airline_image.jpg')
 # Graph of a elbow_method result, we took an image after running it once, because it takes too much time to finish 
 image2 = Image.open('elbow_met.jpg')
 
+# Learning curve graph for Logistic Regression
+image3 = Image.open('learning_curve_log_reg.png')
+
+# Learning curve graph for Random Forest
+image4 = Image.open('learning_curve_random_forest.png')
+
 with header:
     st.title('What factors lead to customer satisfaction for an Airline?')
     st.image(image, use_column_width=True)
@@ -340,16 +346,16 @@ with splitting_dataset:
     # Drawing learning curves take a lot of time, we don't want browser to rebuild it every time, so we do caching using @cache before a function
     # Function for learning curve for LogisticRegression
     # @cache
-    def draw_graph1():
-        train_sizes, train_scores, test_scores = learning_curve(LogisticRegression(), x_1, y_1, cv=10, scoring='accuracy', n_jobs=-1, train_sizes=np.linspace(0.01, 1, 50), verbose=1)
-        train_mean = np.mean(train_scores, axis=1)
-        test_mean = np.mean(test_scores, axis=1)
+    # def draw_graph1():
+    #     train_sizes, train_scores, test_scores = learning_curve(LogisticRegression(), x_1, y_1, cv=10, scoring='accuracy', n_jobs=-1, train_sizes=np.linspace(0.01, 1, 50), verbose=1)
+    #     train_mean = np.mean(train_scores, axis=1)
+    #     test_mean = np.mean(test_scores, axis=1)
 
-        fig_curve = plt.figure(figsize=(10, 5))
-        plt.plot(train_sizes, train_mean)
-        plt.plot(train_sizes, test_mean)
+    #     fig_curve = plt.figure(figsize=(10, 5))
+    #     plt.plot(train_sizes, train_mean)
+    #     plt.plot(train_sizes, test_mean)
 
-        return fig_curve
+    #     return fig_curve
 
     # function for drawing confusion matrix
     # @cache
@@ -359,7 +365,7 @@ with splitting_dataset:
     # Learning curve for LogisticRegression
     display_col.markdown('**Learning curve:**')
     display_col.text("blue line - training accuracy\norange line- testing accuracy")
-    display_col.pyplot(draw_graph1())
+    display_col.image(image3, use_column_width=True)
 
     # Drawing of confusion matrix
     display_col.markdown('**Confusion matrix:**')
@@ -404,16 +410,16 @@ with random_forest:
     col1.write(r2_score(Y_test, r_forest.predict(X_test)))
 
     # @cache
-    def draw_graph2():
-        train_sizes, train_scores, test_scores = learning_curve(RandomForestClassifier(n_estimators=20), x_1, y_1, cv=10, scoring='accuracy', n_jobs=-1, train_sizes=np.linspace(0.01, 1, 50), verbose=1)
-        train_mean = np.mean(train_scores, axis=1)
-        test_mean = np.mean(test_scores, axis=1)
+    # def draw_graph2():
+    #     train_sizes, train_scores, test_scores = learning_curve(RandomForestClassifier(n_estimators=20), x_1, y_1, cv=10, scoring='accuracy', n_jobs=-1, train_sizes=np.linspace(0.01, 1, 50), verbose=1)
+    #     train_mean = np.mean(train_scores, axis=1)
+    #     test_mean = np.mean(test_scores, axis=1)
 
-        fig_curve2 = plt.figure(figsize=(10, 5))
-        plt.plot(train_sizes, train_mean)
-        plt.plot(train_sizes, test_mean)
+    #     fig_curve2 = plt.figure(figsize=(10, 5))
+    #     plt.plot(train_sizes, train_mean)
+    #     plt.plot(train_sizes, test_mean)
 
-        return fig_curve2
+    #     return fig_curve2
 
     # @cache
     def conf_matrix2():
@@ -422,7 +428,7 @@ with random_forest:
     # Learning curve for RandomForestClassifier
     col2.markdown('**Learning curve:**')
     col2.text("blue line - training accuracy\norange line- testing accuracy")
-    col2.pyplot(draw_graph2())
+    col2.image(image4, use_column_width=True)
 
     # Drawing of confusion matrix for r_forest
     fig_cm = plt.figure(figsize=(10, 5))
