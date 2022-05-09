@@ -19,6 +19,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import plot_confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
@@ -235,12 +236,13 @@ with removing_outliers:
     st.markdown('As we can see we have a lot of outliers that will greatly affect on the furhter work, so we have to deal with them.')
 
     
-    # After that we have to scale our data using StandardScaler
+    # After that we have to scale large parts of our data using StandardScaler
     scaler = StandardScaler()
     data[['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']] = pd.DataFrame(scaler.fit_transform(data[['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']]), columns = ['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes'])
 
-
-
+    scaling_code = '''scaler = StandardScaler()\ndata[['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']] = \n     pd.DataFrame(scaler.fit_transform(data[['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']]), \n     columns = ['Age', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes'])'''
+    
+    st.code(scaling_code, language='python')
 
     # Changing outliers to NaN values
     for x in data[['Checkin service', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']]:
@@ -368,8 +370,12 @@ with splitting_dataset:
     display_col.image(image3, use_column_width=True)
 
     # Drawing of confusion matrix
+    fig_cm1 = plt.figure(figsize=(10, 5))
+    cm = conf_matrix()
+    ax= plt.subplot()
     display_col.markdown('**Confusion matrix:**')
-    display_col.write(conf_matrix())
+    sns.heatmap(cm, annot=True, fmt='g', ax=ax);  #annot=True to annotate cells, ftm='g' to disable scientific notation
+    display_col.pyplot(fig_cm1)
 
 
 with random_forest:
@@ -431,9 +437,12 @@ with random_forest:
     col2.image(image4, use_column_width=True)
 
     # Drawing of confusion matrix for r_forest
-    fig_cm = plt.figure(figsize=(10, 5))
+    fig_cm2 = plt.figure(figsize=(10, 5))
+    cm = conf_matrix2()
+    ax= plt.subplot()
     col2.markdown('**Confusion matrix:**')
-    col2.write(conf_matrix2())
+    sns.heatmap(cm, annot=True, fmt='g', ax=ax);  #annot=True to annotate cells, ftm='g' to disable scientific notation
+    col2.pyplot(fig_cm2)
 
 
 with k_means:
@@ -537,6 +546,8 @@ with clusters_visualization:
     sns.countplot(x='Inflight service',hue="cluster",data=data)
     plt.title('Rates of Inflight service per cluster', fontsize=14)
     col_2.pyplot(cl_fig12)
+    
+    st.markdown('Every time page reruns numbers and colors of clusters might change, but specific Сharacteristics that describe a cluster will not change.')
 
 with clusters_conclusions:
 
@@ -546,22 +557,23 @@ with clusters_conclusions:
     cluster0, cluster1, cluster2 =  st.columns(3)
 
     # Cluster 0 description
-    cluster0.markdown('**Cluster 0:**')
+    cluster0.markdown('**Сharacteristics specific to one of the clusters:**')
     cluster0.markdown('* Quite high satisfaction level')
     cluster0.markdown('* High satisfaction in: **Food and Drink**, **Seat comfort**, **Inflight entertainment**, **Cleanliness**, **Inflight service**')
     cluster0.markdown('* Low satisfaction in: **Inflight Wifi service**, **Departure/Arrivale time**, **Ease of online booking**')
+    
+    # Cluster 2 description
+    cluster1.markdown('**Сharacteristics specific to second one of the clusters:**')
+    cluster1.markdown('* Satisfaction level is very high')
+    cluster1.markdown('* Quite high satisfaction in: every service was rated high')
+    cluster1.markdown('* Most low satisfaction level among other services, but also quite higher than average in: **Checkin services**')
 
     # Cluster 1 description
-    cluster1.markdown('**Cluster 1:**')
-    cluster1.markdown('* Satisfaction level is slightly below average')
-    cluster1.markdown('* Quite high satisfaction in: **Departure/Arrivale time**')
-    cluster1.markdown('* Low satisfaction in: **Food and Drink**, **Seat comfort**, **Flight entertainment**, **Cleanliness**')
+    cluster2.markdown('**Сharacteristics specific to third one of the clusters:**')
+    cluster2.markdown('* Satisfaction level is slightly below average')
+    cluster2.markdown('* Quite high satisfaction in: **Departure/Arrivale time**')
+    cluster2.markdown('* Low satisfaction in: **Food and Drink**, **Seat comfort**, **Flight entertainment**, **Cleanliness**')
 
-    # Cluster 2 description
-    cluster2.markdown('**Cluster 2:**')
-    cluster2.markdown('* Satisfaction level is very high')
-    cluster2.markdown('* Quite high satisfaction in: every service was rated high')
-    cluster2.markdown('* Most low satisfaction level among other services, but also quite higher than average in: **Checkin services**')
 
 
 
