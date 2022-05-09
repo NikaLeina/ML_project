@@ -1,10 +1,10 @@
 #!/usr/bin/e
 
 
+# Importing needed libraries
 
 from functools import cache
 from tabnanny import verbose
-from turtle import color
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -18,33 +18,45 @@ from sklearn.cluster import KMeans
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-from sklearn.metrics import plot_confusion_matrix
+from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.metrics import plot_roc_curve
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import balanced_accuracy_score
 from sklearn.model_selection import learning_curve
 from scipy.spatial.distance import cdist
-from sklearn.metrics.cluster import completeness_score
 
 import streamlit as st
 
+# Part of the page which contains Header of a project with first image as decoration
 header = st.container()
-dataset = st.container()
-visualization = st.container()
-removing_outliers = st.container()
-splitting_dataset = st.container()
-random_forest = st.container()
-k_means = st.container()
-clusters_visualization = st.container()
-clusters_conclusions = st.container()
-k_means_evaluation = st.container()
 
+# Part of the page in which we read the data from a csv file, List of features and first five elements of a dataaset for user information
+dataset = st.container()
+
+# Part of the page which visualizes the data for better understanding
+visualization = st.container()
+
+# Part of the page where we change words into numerical representation of them, visualizing and removing outliers and scaling the needed data
+removing_outliers = st.container()
+
+# Part of the page where we split the data into training and testing parts and train Logistic regression model
+splitting_dataset = st.container()
+
+# Part of the page where we train Random forest classifier model and evaluate this model
+random_forest = st.container()
+
+# Part of the page where we train KMeans model
+k_means = st.container()
+
+# Part of the page where we do some visualization with KMeans model
+clusters_visualization = st.container()
+
+# Part of the page where make conclusions based on visualization of KMeans model
+clusters_conclusions = st.container()
+
+# Function that reads the data from a csv file, drops unecessary columns and missing values, checks for duplicate values and returns dataset
 # @st.cache()
 def get_data(filename):
     data = pd.read_csv(filename)
@@ -55,12 +67,13 @@ def get_data(filename):
 
     #Making sure that dataset has no duplicates
     data.duplicated().sum()
-    
 
     return data
 
-
+# Airline image for decoration
 image = Image.open('airline_image.jpg')
+
+# Graph of a elbow_method result, we took an image after running it once, because it takes too much time to finish 
 image2 = Image.open('elbow_met.jpg')
 
 with header:
@@ -73,22 +86,22 @@ with dataset:
 
     st.markdown('* **Customer Type:** loyal customer or disloyal customer\n * **Type of Travel:** personal Travel, Business Travel\n * **Age:** ages of the passengers\n * **Class:** travel class in the plane of the passengers (Business, Eco, Eco Plus)\n * **Flight distance:** the flight distance of this journey\n * **Inflight wifi service:** satisfaction level of the inflight wifi service (0:Not Applicable;1-5)\n * **Departure/Arrival time:** satisfaction level of Departure/Arrival time convenient\n * **Online booking:** satisfaction level of online booking\n * **Gate location:** satisfaction level of Gate location\n * **Food and drink:** satisfaction level of Food and drink\n  * **Online boarding:** satisfaction level of online boarding\n * **Seat comfort:** satisfaction level of Seat comfort\n * **Inflight entertainment:** satisfaction level of inflight entertainment\n * **On-board service:** satisfaction level of On-board service\n * **Leg room service:** satisfaction level of Leg room service\n * **Baggage handling:** satisfaction level of baggage handling\n * **Check-in service:** satisfaction level of Check-in service\n * **Inflight service:** satisfaction level of inflight service\n * **Cleanliness:** satisfaction level of Cleanliness\n * **Departure Delay in Minutes:** minutes delayed when departure\n * **Arrival Delay in Minutes:** minutes delayed when arrival\n * **Satisfaction:** Airline satisfaction level(Satisfaction, neutral or dissatisfaction)')
 
-
+    # Reading data with the help of a function above
     data = get_data("train.csv")
 
-
     st.subheader('Here we can see first five elements of our dataset: ')
+
+    # Visualizing first five elements of a dataset
     st.write(data.head())
-
-
-
 
 
 with visualization:
     st.subheader('Let\'s visualize our data to understand it better:')
 
+    # Dividing a visualization part of page into two columns with equal widths
     graph1, graph2 = st.columns([1, 1])
 
+    # Visualizing the data
     fig1 = plt.figure(figsize=(10, 5))
     sns.countplot(x = "Class", data = data)
     plt.title('Number of customers per class', fontsize=14)
@@ -174,12 +187,23 @@ with removing_outliers:
 
     st.subheader('And now we have to deal with outliers! \n We dropped missing values from dataset right after reading the data to a dataframe and made sure we have no duplicated values among the data. ')
 
+    # max values of columns are different so we have to split it so that we can see outliers clearer and then Scale large data using StandardScaler
+
+    # data with max_value = 5 (customer ratings)
     df_1 = data[['Inflight wifi service', 'Departure/Arrival time convenient', "Ease of Online booking", "Gate location", 
            "Food and drink", "Online boarding", "Seat comfort", "Inflight entertainment", "On-board service", 
            "Leg room service", "Baggage handling", "Checkin service", "Inflight service", "Cleanliness"]]
+
+    # data with max_value more than 1000
     df_2 = data[['Departure Delay in Minutes', 'Arrival Delay in Minutes',]]
+
+    # data with max_value more than 10000
     df_3 = data[['Flight Distance']]
+
+    # data with max_value approximately 130
     df_4 = data[['Age']]
+
+    # Visualizing outliers for every dataset above
 
     st.markdown('**Visualizing outliers among customers\' rating for airline services:**')
 
@@ -233,6 +257,7 @@ with removing_outliers:
 
     st.markdown('We will find outliers using IQR technique, then change them to NaN values and after we will drop NaN values from dataset: ')
 
+    # Showing code-blocks in a web page
     code1 = '''for x in data[['Checkin service', 'Flight Distance', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']]:
                   q75,q25 = np.percentile(data.loc[:,x],[75,25])
                   IQR = q75-q25
@@ -256,35 +281,41 @@ with removing_outliers:
     st.code(code2, language='python')
 
 
-
-
-
 with splitting_dataset:
     st.subheader('Here we will split data and create Logistic Regression model:')
 
+    # Dividing data into dependent and independent variables
+
+    # Everything except satisfaction column is independent
     x_1 = data.iloc[:, 0:22].values
+
+    # satisfaction column is dependent, we will predict it relying on the independent variables
     y_1 = data.iloc[:, 22].values
 
+    # Storing data into dataframes
     X = pd.DataFrame(x_1) 
     Y = pd.DataFrame(y_1)
 
+    # Dividing data into training and testing parts (20% - testing data size)
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.20, random_state = 0)
 
+    # Showing code-blocks in a web page
     code3 = ''' # Spliiting data into dependent and independent parts:\n\n# Independent\nX = pd.DataFrame(data.iloc[:, 0:22].values)\n\n# Dependent\nY = pd.DataFrame(data.iloc[:,22].values)\n\n# Splitting data into training and testing parts\nX_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.20, random_state = 0)\n\n# Creating a model:\nlog_model = LogisticRegression()\nlog_model.fit(X_train, Y_train) '''
-
     st.code(code3, language='python')
 
     st.subheader('Evaluating Logistic Regression model:')
 
-
+    # Dividing splitting_dataset part of the page into two columns 
+    # select-col contains model evaluation, display_col contains learning curve of a model and confusion matrix
     select_col, display_col = st.columns(2)
 
-
-
+    # Creating LogisticRegression model
     log_model = LogisticRegression()
+
+    # Fitting LogisticRegression model with training part of a data
     log_model.fit(X_train, Y_train)
 
-
+    # Model evaluation: we do predictions with LogisticRegression for every value based on the X_test, then comparing result of pedictions to our actual Y_test
     select_col.text('Prediction Accuracy:')
     select_col.write(accuracy_score(Y_test, log_model.predict(X_test)))
 
@@ -306,13 +337,13 @@ with splitting_dataset:
     select_col.text('R squared score:')
     select_col.write(r2_score(Y_test, log_model.predict(X_test)))
 
+    # Drawing learning curves take a lot of time, we don't want browser to rebuild it every time, so we do caching using @cache before a function
+    # Function for learning curve for LogisticRegression
     @cache
     def draw_graph1():
         train_sizes, train_scores, test_scores = learning_curve(LogisticRegression(), x_1, y_1, cv=10, scoring='accuracy', n_jobs=-1, train_sizes=np.linspace(0.01, 1, 50), verbose=1)
         train_mean = np.mean(train_scores, axis=1)
-        # train_std = np.std(train_scores, axis=1)
         test_mean = np.mean(test_scores, axis=1)
-        # test_std = np.std(test_scores, axis=1)
 
         fig_curve = plt.figure(figsize=(10, 5))
         plt.plot(train_sizes, train_mean)
@@ -320,14 +351,17 @@ with splitting_dataset:
 
         return fig_curve
 
+    # function for drawing confusion matrix
     @cache
     def conf_matrix():
         return confusion_matrix(Y_test, log_model.predict(X_test))
     
+    # Learning curve for LogisticRegression
     display_col.markdown('**Learning curve:**')
     display_col.text("blue line - training accuracy\norange line- testing accuracy")
     display_col.pyplot(draw_graph1())
 
+    # Drawing of confusion matrix
     display_col.markdown('**Confusion matrix:**')
     display_col.write(conf_matrix())
 
@@ -336,16 +370,18 @@ with random_forest:
     st.subheader('Creating Random Forest classification model:')
 
     code4 = '''# Creating and training a model:\nr_forest = RandomForestClassifier(n_estimators=20)\n\nr_forest.fit(X_train, Y_train) '''
-
     st.code(code4, language='python')
 
     st.subheader('Evaluating RandomForestClassifier model:')
 
+    # Dividing random_forest part of the page into two columns
     col1, col2 = st.columns(2)
 
+    # Creating and training a model
     r_forest = RandomForestClassifier(n_estimators=20)
     r_forest.fit(X_train, Y_train)
 
+    # Model evaluation: we do predictions with RandomForestClassifier for every value based on the X_test, then comparing result of pedictions to our actual Y_test
     col1.text('Prediction Accuracy:')
     col1.write(accuracy_score(Y_test, r_forest.predict(X_test)))
 
@@ -371,9 +407,7 @@ with random_forest:
     def draw_graph2():
         train_sizes, train_scores, test_scores = learning_curve(RandomForestClassifier(n_estimators=20), x_1, y_1, cv=10, scoring='accuracy', n_jobs=-1, train_sizes=np.linspace(0.01, 1, 50), verbose=1)
         train_mean = np.mean(train_scores, axis=1)
-        train_std = np.std(train_scores, axis=1)
         test_mean = np.mean(test_scores, axis=1)
-        test_std = np.std(test_scores, axis=1)
 
         fig_curve2 = plt.figure(figsize=(10, 5))
         plt.plot(train_sizes, train_mean)
@@ -385,25 +419,26 @@ with random_forest:
     def conf_matrix2():
         return confusion_matrix(Y_test, r_forest.predict(X_test))
 
-    
+    # Learning curve for RandomForestClassifier
     col2.markdown('**Learning curve:**')
     col2.text("blue line - training accuracy\norange line- testing accuracy")
     col2.pyplot(draw_graph2())
 
+    # Drawing of confusion matrix for r_forest
     fig_cm = plt.figure(figsize=(10, 5))
     col2.markdown('**Confusion matrix:**')
     col2.write(conf_matrix2())
 
 
-
-
 with k_means:
 
     st.subheader('Creating KMeans model:')
-
     st.markdown('Using elbow method we calculated the optimal number of clusters is 8, but we want to choose k = 3')
+
+    # Image is a result of a function below, we decided to make a picture of it because of too long calculations
     st.image(image2, use_column_width=True)
 
+    # Function for finding optimal number of clusters
     @cache
     def elbow_met(data):
         distortions = []
@@ -419,21 +454,24 @@ with k_means:
         st.pyplot(clusters_curve)
         
     
-
+    # Creating KMeans model with 3 Number of clusters = 3
     kmeans = KMeans(n_clusters=3)
+
+    # Fit our data and predict to which claster every datapoint belongs, and then create separate column ["cluster"] in our dataset and store results there
     data["cluster"] = kmeans.fit_predict(data[data.columns[2:]])
 
+    # Showing code-block on a web-page
     code5 = '''# Creating and training a model with k=3 clusters:\nkmeans = KMeans(n_clusters=3)\n# Then predicting cluster for each datapoint in our datase\n# and storing it in a separate column\n data["cluster"] = kmeans.fit_predict(data[data.columns[2:]]) '''
-
     st.code(code5, language='python')
 
 with clusters_visualization:
 
     st.subheader('Visualizing clusters:')
 
+    # Dividing clusters_visualization part of a page into two columns, so we could visualize graphs in two columns
     col_1, col_2 = st.columns(2)
 
-
+    # Visualizing clusters in two columns by every Airline service's rate and see if we can find how data was divided into clusters
     cl_fig1 = plt.figure(figsize=(10, 5))
     sns.countplot(x='Inflight wifi service',hue="cluster",data=data)
     plt.title('Rates of Inflight wifi service per cluster', fontsize=14)
@@ -498,19 +536,22 @@ with clusters_conclusions:
 
     st.subheader('Conclusions:')
 
+    # Dividing clusters_conclusions part of a page into three columns to write a description for every cluster based on graphs above
     cluster0, cluster1, cluster2 =  st.columns(3)
 
+    # Cluster 0 description
     cluster0.markdown('**Cluster 0:**')
     cluster0.markdown('* Quite high satisfaction level')
     cluster0.markdown('* High satisfaction in: **Food and Drink**, **Seat comfort**, **Inflight entertainment**, **Cleanliness**, **Inflight service**')
     cluster0.markdown('* Low satisfaction in: **Inflight Wifi service**, **Departure/Arrivale time**, **Ease of online booking**')
 
-    
+    # Cluster 1 description
     cluster1.markdown('**Cluster 1:**')
     cluster1.markdown('* Satisfaction level is slightly below average')
     cluster1.markdown('* Quite high satisfaction in: **Departure/Arrivale time**')
     cluster1.markdown('* Low satisfaction in: **Food and Drink**, **Seat comfort**, **Flight entertainment**, **Cleanliness**')
 
+    # Cluster 2 description
     cluster2.markdown('**Cluster 2:**')
     cluster2.markdown('* Satisfaction level is very high')
     cluster2.markdown('* Quite high satisfaction in: every service was rated high')
